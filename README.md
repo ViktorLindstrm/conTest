@@ -2,7 +2,9 @@ conTest
 =====
 
 Simple ping server made complicated
-An OTP application
+
+Using os.command to call ping for keeping track of what network state
+servers are in.
 
 Build
 -----
