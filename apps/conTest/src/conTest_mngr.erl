@@ -76,7 +76,7 @@ handle_call(start_timer, _From, State) ->
   Reply = gen_server:call(conTest_timer,start),
   {reply, Reply, State};
 handle_call({set_timer,Time}, _From, State) ->
-  Reply = gen_server:call(conTest_timer,{set,Time}),
+  Reply = gen_server:call(conTest_timer,{set,Time*1000}),
   {reply, Reply, State};
 
 handle_call({add_node,IP}, _From, State = #state{nodes=Nodes}) ->
@@ -104,7 +104,7 @@ handle_call({solicit_node,IP}, _From, #state{nodes = Nodes} = State) ->
           end,
   {reply,Reply,State};
 
-handle_call({solicit_all},_From, State) ->
+handle_call(solicit_all,_From, State) ->
   Workers = supervisor:which_children(conTest_supsup),
   RList = lists:map(fun({_,Pid,_,_}) -> 
                         {_, X } = gen_server:call(Pid,{ping}),
@@ -126,8 +126,8 @@ handle_call({solicit_all},_From, State) ->
 %% @end
 %%--------------------------------------------------------------------
 handle_cast(timer, State) ->
-    io:format("Got timerevent"),
-    {noreply, State}.
+  io:format("timer hello~n"),
+  {noreply, State}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -177,7 +177,7 @@ delete_node(IP) ->
 solicit_node(IP) ->
   gen_server:call(?MODULE,{solicit_node,IP}).
 solicit_all() ->
-  gen_server:call(?MODULE,{solicit_all}).
+  gen_server:call(?MODULE,solicit_all).
 start_timer() ->
   gen_server:call(?MODULE,start_timer).
 stop_timer() ->
