@@ -104,10 +104,13 @@ handle_call({solicit_node,IP}, _From, #state{nodes = Nodes} = State) ->
           end,
   {reply,Reply,State};
 
-handle_call(solicit_all,_From, State) ->
-  Workers = supervisor:which_children(conTest_supsup),
-  RList = lists:map(fun({_,Pid,_,_}) -> 
+handle_call(solicit_all,_From, #state{nodes = Nodes} = State) ->
+  io:format("Soliciting~n"),
+  Workers = ets:match(Nodes,'$1'),
+  io:format("Got nodes~n"),
+  RList = lists:map(fun([{_,Pid}]) -> 
                         {_, X } = gen_server:call(Pid,{ping}),
+                        io:format("Asking ~p~n",[Pid]),
                         X
                     end,
                     Workers),
@@ -126,7 +129,7 @@ handle_call(solicit_all,_From, State) ->
 %% @end
 %%--------------------------------------------------------------------
 handle_cast(timer, State) ->
-  io:format("timer hello~n"),
+  spawn(fun() -> timer_function() end),
   {noreply, State}.
 
 %%--------------------------------------------------------------------
@@ -184,3 +187,5 @@ stop_timer() ->
   gen_server:call(?MODULE,stop_timer).
 set_timer(Time) ->
   gen_server:call(?MODULE,{set_timer,Time}).
+timer_function() ->
+  solicit_all().

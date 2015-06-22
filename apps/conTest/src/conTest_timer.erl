@@ -68,7 +68,7 @@ handle_call({set,Timeout}, _From, State) ->
 
 handle_call(start, _From, #state{time = T} = State) ->
   Reply = case T of 
-            undifined -> 
+            undefined -> 
               {error, no_timeout_specificed};
             _ ->
               startTimer(),
