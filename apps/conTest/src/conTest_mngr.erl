@@ -9,6 +9,7 @@
          stop_timer/0,
          delete_node/1,
          solicit_node/1,
+         get_nodes/0,
          solicit_all/0,
          start_node/1]).
 
@@ -108,15 +109,23 @@ handle_call(solicit_all,_From, #state{nodes = Nodes} = State) ->
   io:format("Soliciting~n"),
   Workers = ets:match(Nodes,'$1'),
   io:format("Got nodes~n"),
-  RList = lists:map(fun([{_,Pid}]) -> 
+  RList = lists:map(fun([{IP,Pid}]) -> 
                         {_, X } = gen_server:call(Pid,{ping}),
                         io:format("Asking ~p~n",[Pid]),
-                        X
+                        {IP,X}
+                    end,
+                    Workers),
+  Reply = {ok,RList},
+  {reply,Reply,State};
+                   
+handle_call(get_nodes,_From, #state{nodes = Nodes} = State) ->
+  Workers = ets:match(Nodes,'$1'),
+  RList = lists:map(fun([{IP,_}]) -> 
+                        IP
                     end,
                     Workers),
   Reply = {ok,RList},
   {reply,Reply,State}.
-                   
   
 %%--------------------------------------------------------------------
 %% @private
@@ -187,5 +196,7 @@ stop_timer() ->
   gen_server:call(?MODULE,stop_timer).
 set_timer(Time) ->
   gen_server:call(?MODULE,{set_timer,Time}).
+get_nodes() -> 
+  gen_server:call(?MODULE,get_nodes).
 timer_function() ->
   solicit_all().

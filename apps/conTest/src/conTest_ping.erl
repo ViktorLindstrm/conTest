@@ -65,7 +65,12 @@ init([IP]) ->
 handle_call({ping}, _From, #state{ip = IP} = State) ->
     Result = os:cmd("ping -c 1 -W 1 "++IP ),
     TResult = parse_ip(Result),
-    Reply = {ok,TResult},
+    io:format("R : ~p~n",[TResult]),
+    Reply  = case TResult of 
+               {error, E} -> {error,E};
+               _ -> {ok,TResult}
+             end,
+    %Reply = {ok,TResult},
     {reply, Reply, State}.
 
 %%--------------------------------------------------------------------
@@ -126,12 +131,17 @@ ping(IP) ->
   gen_server:call(?MODULE,{ping,IP}).
 parse_ip(Raw) ->
     Rows = string:tokens(Raw,"\n"),
-    case length(Rows) > 3 of 
+    io:format("Rows : ~p~n",[Rows]),
+    case length(Rows) > 1 of 
       true -> 
-        [X1,X2,X3,X4,X5,X6,X7,X8,X9,X10] = string:tokens(lists:nth(4,Rows)," "),
-        {X1,X2++ " "++X3,X4,X5,X6,X7++" "++X8,X10,X9};
-      false ->
-        [X1,X2,X3,X4,X5,X6,X7,X8,X9,X10] = string:tokens(lists:nth(3,Rows)," "),
-        {X1,X2++ " "++X3,X4,X5,X6,X7++" "++X8,X10,X9}
+        [X1,X2,X3,X4,X5,X6,X7,X8,X9,X10] = case length(Rows) > 3 of 
+                                             true -> 
+                                               string:tokens(lists:nth(4,Rows)," ");
+                                             false ->
+                                               string:tokens(lists:nth(3,Rows)," ")
+                                           end,
+        {X2++"_"++lists:sublist(X3,1,length(X3)-1),X1,lists:sublist(X5,1,length(X5)-1),X4,X7++"_"++lists:sublist(X8,1,length(X8)-1),X6,X9,X10};
+      false -> 
+        {error,unknown_host}
     end.
 
