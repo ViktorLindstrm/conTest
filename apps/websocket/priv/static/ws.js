@@ -83,7 +83,6 @@ function onClose(evt) {
   showScreen('<span style="color: red;">DISCONNECTED </span>');
 };  
 function onMessage(evt) { 
-  console.log(evt);
   if(evt.data.substr(0,3) == "add"){
     var node = jQuery.parseJSON(evt.data.substr(4,evt.data.length));
     nodes.push(node);
@@ -126,6 +125,7 @@ function showScreen(txt) {
 };
 function updateNodes() {
   var htmlString = "<table>";
+  htmlString = htmlString+ "<thead><tr><td>Server</td><td>State</td><td>Test</td><td>Remove</td><tr></thead><tbody>";
   for(i = 0; i < nodes.length; i++){
     node = nodes[i];
     htmlString = htmlString + "<tr>";
@@ -146,7 +146,7 @@ function updateNodes() {
     htmlString = htmlString + '<td><button type="button" onclick="removeNode(\''+node.ip+'\');">remove node</button></td>';
     htmlString = htmlString + "</tr>";
   }
-  htmlString = htmlString+"</table>";
+  htmlString = htmlString+"</tbody></table>";
   $('#nodes').html(htmlString);
 }
 function clearScreen() 

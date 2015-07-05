@@ -1,15 +1,16 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-    <title>Websocket client Test</title>
+    <title>ConTest</title>
+    <link rel="stylesheet" type="text/css" href="/static/stylesheet.css">
     <script src="/static/jquery.min.js"></script>
     <script src="/static/ws.js"></script>
   </head>
 
   <body>
     <div id="header">
-      <h1>Websocket client</h1>
-      <div id="status"></div>
+      <h1>ConTest</h1>
+      <h3> Connection Testing utility</h3>
     </div>
     <div id="navigation">
       <!--<p id="connecting">-->
@@ -17,13 +18,13 @@
       <!--<button type="button" onclick="toggle_connection()">connection</button>-->
       <!--</p>-->
       <div id="connected">				
+        <div id="nodes"> </div>
         <p>
         <input type='text' id="send_txt" value=></input>
         <button type="button" onclick="addNode();">Add node</button>
         </p>
       </div>
       <div id="content">						
-        <div id="nodes"> </div>
         <!--<button id="clear" onclick="clearScreen()" >Clear text</button>-->
         <!--<div id="output"></div>-->
         <button id="test_all" onclick="testAll()">Test all</button>
