@@ -134,12 +134,12 @@ function updateNodes() {
     if(node.data != "null"){
       var info = node.data;
       if(info.packets_transmitted.trim() == info.received.trim()){
-        htmlString = htmlString + "<td>ok</td>";
+        htmlString = htmlString + "<td bgcolor='#76EE00'>ok</td>";
       }else{
-        htmlString = htmlString + "<td>no connection</td>";
+        htmlString = htmlString + "<td bgcolor='#ff1919'>no connection</td>";
       }
     } else {
-      htmlString = htmlString + "<td>no data</td>";
+      htmlString = htmlString + "<td bgcolor='#d3d3d3'>no data</td>";
     }
 
     htmlString = htmlString + '<td><button type="button" onclick="sendTest(\''+node.ip+'\');">test node</button></td>';
