@@ -36,7 +36,7 @@ websocket_handle({text, <<"add ",BinaryIP/binary>>}, Req, State) ->
 websocket_handle({text, <<"testall">>}, Req, State) ->
   {ok,Ret} = conTest_mngr:solicit_all(),
   Nodes = lists:map(fun({IP,RawData}) -> 
-                        io:format("~p~n",[RawData]),
+                        %io:format("~p~n",[RawData]),
                         case RawData of 
                           unknown_host ->
                             ip_status_to_json(IP,"\"null\"");
@@ -51,9 +51,9 @@ websocket_handle({text, <<"testall">>}, Req, State) ->
 	{reply, {text,<<"testall ",BinNodes/binary>> }, Req, State};
 
 websocket_handle({text, <<"test ",BinaryIP/binary>>}, Req, State) ->
-  io:format("Testar!!~n~p~n",[BinaryIP]),
+  %io:format("Testar!!~n~p~n",[BinaryIP]),
   IP = erlang:binary_to_list(BinaryIP),
-  io:format("IP: ~p~n",[IP]),
+  %io:format("IP: ~p~n",[IP]),
   Node = case conTest_mngr:solicit_node(IP) of 
            {ok,Ret} ->
              Data = status_to_json(Ret),

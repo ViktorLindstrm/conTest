@@ -34,10 +34,9 @@ function toggle_connection(){
   };
 };
 function addNode() {
-
   if(websocket.readyState == websocket.OPEN){
     txt = $("#send_txt").val();
-    if(txt != "") {
+    if(txt != "" && !containsIP(txt,nodes)) {
       websocket.send("add "+txt);
       showScreen('sending: ' + txt); 
     }else {
@@ -56,7 +55,6 @@ function sendTest(ip) {
 };
 function testAll() {
   if(websocket.readyState == websocket.OPEN){
-    console.log("testing all");
     for(i = 0; i<nodes.length;i++) {
       sendTest(nodes[i].ip);
     }
@@ -89,15 +87,16 @@ function onClose(evt) {
 };  
 function onMessage(evt) { 
   if(evt.data.substr(0,3) == "add"){
+
     var node = jQuery.parseJSON(evt.data.substr(4,evt.data.length));
-    console.log(node);
+    if(!containsIP(node.ip,nodes)) {
     nodes.push(node);
     updateNodes();
+    }
   }else if(evt.data.substr(0,4) == "init"){
     var allNodes = jQuery.parseJSON(evt.data.substr(5,evt.data.length));
     for( j = 0; j < allNodes.length; j++) {
       var node = jQuery.parseJSON(allNodes[j]);
-      console.log(node);
       nodes.push(node);
     }
     updateNodes();
@@ -178,9 +177,14 @@ if (!browserSupportFileUpload()) {
             var csvData = event.target.result;
             data = csvData.trim().split(',');
             for(i = 0 ;i < data.length;i++){
+              console.log(data[i]);
               websocket.send("add "+data[i]);
             }
             updateNodes();
+            $('input[name=File Upload]').val("");
+
+            document.getElementById("txtFileUpload").value = "";
+
             if (data && data.length > 0) {
               alert('Imported -' + data.length + '- rows successfully!');
             } else {
@@ -191,4 +195,13 @@ if (!browserSupportFileUpload()) {
             alert('Unable to read ' + file.fileName);
         };
     }
+}
+
+function containsIP(elem,list) {
+  for(i = 0; i<list.length;i++) {
+    if ( list[i].ip == elem ) {
+      return true;
+    }
+  }
+  return false;
 }
