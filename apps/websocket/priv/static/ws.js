@@ -2,6 +2,7 @@ var nodes = [];
 var websocket;
 $(document).ready(init);
 function init() {
+  document.getElementById('txtFileUpload').addEventListener('change', upload, false);
   $('#server').val("ws://" + window.location.host + "/websocket");
   if(!("WebSocket" in window)){  
     $('#status').append('<p><span style="color: red;">websockets are not supported </span></p>');
@@ -33,6 +34,7 @@ function toggle_connection(){
   };
 };
 function addNode() {
+
   if(websocket.readyState == websocket.OPEN){
     txt = $("#send_txt").val();
     if(txt != "") {
@@ -47,7 +49,7 @@ function addNode() {
 };
 function sendTest(ip) {
   if(websocket.readyState == websocket.OPEN){
-    websocket.send("test "+ip);
+    websocket.send("test "+ip.trim());
   } else {
     showScreen('websocket is not connected'); 
   }
@@ -55,7 +57,10 @@ function sendTest(ip) {
 function testAll() {
   if(websocket.readyState == websocket.OPEN){
     console.log("testing all");
-    websocket.send("testall");
+    for(i = 0; i<nodes.length;i++) {
+      sendTest(nodes[i].ip);
+    }
+    //websocket.send("testall");
   } else {
     showScreen('websocket is not connected'); 
   }
@@ -85,6 +90,7 @@ function onClose(evt) {
 function onMessage(evt) { 
   if(evt.data.substr(0,3) == "add"){
     var node = jQuery.parseJSON(evt.data.substr(4,evt.data.length));
+    console.log(node);
     nodes.push(node);
     updateNodes();
   }else if(evt.data.substr(0,4) == "init"){
@@ -153,3 +159,36 @@ function clearScreen()
 { 
   $('#output').html("");
 };
+function browserSupportFileUpload() {
+    var isCompatible = false;
+    if (window.File && window.FileReader && window.FileList && window.Blob) {
+    isCompatible = true;
+    }
+    return isCompatible;
+}
+function upload(evt) {
+if (!browserSupportFileUpload()) {
+    alert('The File APIs are not fully supported in this browser!');
+    } else {
+        var data = null;
+        var file = evt.target.files[0];
+        var reader = new FileReader();
+        reader.readAsText(file);
+        reader.onload = function(event) {
+            var csvData = event.target.result;
+            data = csvData.trim().split(',');
+            for(i = 0 ;i < data.length;i++){
+              websocket.send("add "+data[i]);
+            }
+            updateNodes();
+            if (data && data.length > 0) {
+              alert('Imported -' + data.length + '- rows successfully!');
+            } else {
+                alert('No data to import!');
+            }
+        };
+        reader.onerror = function() {
+            alert('Unable to read ' + file.fileName);
+        };
+    }
+}

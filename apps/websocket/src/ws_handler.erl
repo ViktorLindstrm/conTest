@@ -51,12 +51,15 @@ websocket_handle({text, <<"testall">>}, Req, State) ->
 	{reply, {text,<<"testall ",BinNodes/binary>> }, Req, State};
 
 websocket_handle({text, <<"test ",BinaryIP/binary>>}, Req, State) ->
+  io:format("Testar!!~n~p~n",[BinaryIP]),
   IP = erlang:binary_to_list(BinaryIP),
+  io:format("IP: ~p~n",[IP]),
   Node = case conTest_mngr:solicit_node(IP) of 
            {ok,Ret} ->
              Data = status_to_json(Ret),
              erlang:list_to_binary(ip_status_to_json(IP,Data));
-           {error,_} ->
+           {error,N} ->
+             io:format("Error!~n~p~n",[N]),
              erlang:list_to_binary(ip_status_to_json(IP,"\"null\""))
          end,
   {reply, {text,<<"test ",Node/binary>> }, Req, State};
